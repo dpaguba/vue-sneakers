@@ -1,6 +1,6 @@
 <script setup>
 import Header from './components/Header.vue'
-import Card from './components/Card.vue'
+import CardList from './components/CardList.vue'
 </script>
 
 <template>
@@ -8,12 +8,9 @@ import Card from './components/Card.vue'
     <Header></Header>
 
     <div class="p-10">
-      <h2 class="text-3xl font-bold">All Sneakers</h2>
-      <div>
-        <Card />
-        <Card />
-        <Card />
-      </div>
+      <h2 class="text-3xl font-bold mb-8">All Sneakers</h2>
+
+      <CardList></CardList>
     </div>
   </div>
 </template>
