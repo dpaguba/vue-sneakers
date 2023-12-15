@@ -1,7 +1,11 @@
-<script setup></script>
+<script setup>
+import Header from './components/Header.vue'
+</script>
 
 <template>
-  <h1>Dmytro Pahuba</h1>
+  <div class="bg-white w-4/5 h-screen m-auto rounded-xl shadow-xl mt-14">
+    <Header></Header>
+  </div>
 </template>
 
 <style scoped></style>
