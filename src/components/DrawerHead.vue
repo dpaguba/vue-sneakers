@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center gap-5">
+  <div class="flex items-center gap-5 mb-5">
     <img
       src="/arrow-next.svg"
       alt=""
