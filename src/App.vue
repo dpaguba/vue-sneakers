@@ -1,7 +1,46 @@
 <script setup>
+import { onMounted, ref, watch } from 'vue'
+import axios from 'axios'
+
 import Header from './components/Header.vue'
 import CardList from './components/CardList.vue'
 // import Drawer from './components/Drawer.vue'
+
+const items = ref([])
+
+const filters = ref({
+  sortBy: 'title',
+  searchQuery: ''
+})
+
+const onChangeSelect = (event) => {
+  filters.value.sortBy = event.target.value
+}
+
+const onChangeSearchInput = (event) => {
+  filters.value.searchQuery = event.target.value
+}
+
+const fetchItems = async () => {
+  try {
+    const params = {
+      sortBy: filters.value.sortBy
+    }
+
+    if (filters.value.searchQuery) {
+      params.title = `*${filters.value.searchQuery}*`
+    }
+
+    const { data } = await axios.get(`https://bdbf900dc532c768.mokky.dev/items`, { params: params })
+    items.value = data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+onMounted(fetchItems)
+
+watch(filters.value, fetchItems)
 </script>
 
 <template>
@@ -14,15 +53,16 @@ import CardList from './components/CardList.vue'
         <h2 class="text-3xl font-bold mb-8">All Sneakers</h2>
 
         <div class="flex gap-4">
-          <select class="py-2 px-3 border rounded-md outline-none">
-            <option>Newest</option>
-            <option>Price (High-Low)</option>
-            <option>Price (Low-High)</option>
+          <select @change="onChangeSelect" class="py-2 px-3 border rounded-md outline-none">
+            <option value="name">Name</option>
+            <option value="-price">Price (High-Low)</option>
+            <option value="price">Price (Low-High)</option>
           </select>
 
           <div class="relative">
             <img class="absolute left-4 top-3" src="/search.svg" alt="" />
             <input
+              @input="onChangeSearchInput"
               class="border rounded-md py-2 pl-11 pr02 outline-none focus:border-gray-400"
               type="text"
               placeholder="Search..."
@@ -31,7 +71,9 @@ import CardList from './components/CardList.vue'
         </div>
       </div>
 
-      <CardList></CardList>
+      <div class="mt-10">
+        <CardList :items="items" />
+      </div>
     </div>
   </div>
 </template>
