@@ -1,5 +1,7 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup>
 defineProps({
+  id: Number,
   title: String,
   price: Number,
   imageUrl: String,
