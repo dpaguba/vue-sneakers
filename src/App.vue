@@ -7,7 +7,6 @@ import CardList from './components/CardList.vue'
 // import Drawer from './components/Drawer.vue'
 
 const items = ref([])
-
 const filters = ref({
   sortBy: 'title',
   searchQuery: ''
@@ -21,6 +20,50 @@ const onChangeSearchInput = (event) => {
   filters.value.searchQuery = event.target.value
 }
 
+const fetchFavorites = async () => {
+  try {
+    const { data: favorites } = await axios.get(`https://bdbf900dc532c768.mokky.dev/favorites`)
+
+    items.value = items.value.map((item) => {
+      const favorite = favorites.find((favorite) => favorite.productId === item.id)
+
+      if (!favorite) {
+        return item
+      } else {
+        return {
+          ...item,
+          isFavorite: true,
+          favoriteId: favorite.id
+        }
+      }
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const addToFavorite = async (item) => {
+  try {
+    if (!item.isFavorite) {
+      item.isFavorite = true
+
+      const obj = {
+        productId: item.id
+      }
+
+      const { data } = await axios.post(`https://bdbf900dc532c768.mokky.dev/favorites`, obj)
+
+      item.favoriteId = data.id
+    } else {
+      item.isFavorite = false
+      await axios.delete(`https://bdbf900dc532c768.mokky.dev/favorites/${item.favoriteId}`)
+      item.favoriteId = null
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 const fetchItems = async () => {
   try {
     const params = {
@@ -32,13 +75,21 @@ const fetchItems = async () => {
     }
 
     const { data } = await axios.get(`https://bdbf900dc532c768.mokky.dev/items`, { params: params })
-    items.value = data
+    items.value = data.map((obj) => ({
+      ...obj,
+      isFavorite: false,
+      favoriteId: null,
+      isAdded: false
+    }))
   } catch (error) {
     console.log(error)
   }
 }
 
-onMounted(fetchItems)
+onMounted(async () => {
+  await fetchItems()
+  await fetchFavorites()
+})
 
 watch(filters.value, fetchItems)
 </script>
@@ -72,7 +123,7 @@ watch(filters.value, fetchItems)
       </div>
 
       <div class="mt-10">
-        <CardList :items="items" />
+        <CardList :items="items" @addToFavorite="addToFavorite" />
       </div>
     </div>
   </div>
